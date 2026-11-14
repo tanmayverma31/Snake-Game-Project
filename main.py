@@ -138,6 +138,22 @@ async def start_game_endpoint():
             "score": 0
         }
     }
+    @app.get("/api/game/ai/status")
+async def get_ai_status():
+    # Tells the frontend the AI backend is ready
+    return {"status": "online"}
+
+@app.get("/api/game/ai/challenge")
+async def get_ai_challenge(difficulty: str = "EASY"):
+    # Returns the actual starting board that the frontend is crashing without
+    return {
+        "status": "success",
+        "game_state": {
+            "snake": [{"x": 10, "y": 10}, {"x": 10, "y": 11}],
+            "food": {"x": 5, "y": 5},
+            "score": 0
+        }
+    }
     
 
 
