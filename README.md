@@ -211,3 +211,5 @@ Open your browser and navigate to:
 - **Play the Game**: [http://localhost:8000/](http://localhost:8000/) or [http://localhost:8000/play](http://localhost:8000/play)
 - **Interactive Swagger API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 - **Health Check**: [http://localhost:8000/api/game/health](http://localhost:8000/api/game/health)
+#   S n a k e - G a m e - P r o j e c t  
+ 
