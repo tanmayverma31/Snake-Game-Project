@@ -20,12 +20,20 @@
 <body class="arcade-theme">
 
   <script src="/static/js/api.js"></script>
-  <script src="/static/js/app.js"></script>
   <script src="/static/js/audio.js"></script>
   <script src="/static/js/canvas.js"></script>
   <script src="/static/js/controls.js"></script>
   <script src="/static/js/particles.js"></script>
 
+
+   <!-- 2. Main game loop loaded LAST -->
+   <script src="/static/js/app.js" defer></script>
+
+
+</head>
+<body class="arcade-theme">
+
+>>>>>>> 6dd864d (fix api paths)
   <!-- Background Ambient Glow & Cyber Grid -->
   <div class="ambient-glow glow-top"></div>
   <div class="ambient-glow glow-bottom"></div>

@@ -111,9 +111,8 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 async def read_index():
 
     html_path = os.path.join(static_dir, "index.html")
-    return FileResponse("static/index.html")
+    return FileResponse(html_path)
 
-    return FileResponse("static/**")
 
 
 
