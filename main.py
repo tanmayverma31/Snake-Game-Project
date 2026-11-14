@@ -91,18 +91,25 @@ def main():
     else:
         # Default action is running server
         run_server(host=args.host, port=args.port, reload=args.reload)
+import os
 import fastapi
 
 # Ensure the variable name is explicitly 'app'
 from pathlib import Path
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 app = fastapi.FastAPI()
 
+current_dir = os.path.dirname(os.path.realpath(__file__))
+static_dir = os.path.join(current_dir, "static")
+
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
 @app.get("/")
 async def read_index():
+    html_path = os.path.join(static_dir, "index.html")
     return FileResponse("static/index.html")
 
 
