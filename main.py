@@ -91,7 +91,14 @@ def main():
     else:
         # Default action is running server
         run_server(host=args.host, port=args.port, reload=args.reload)
+import fastapi
 
+# Ensure the variable name is explicitly 'app'
+app = fastapi.FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}
 
 if __name__ == "__main__":
     main()
