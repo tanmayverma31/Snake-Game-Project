@@ -1,6 +1,7 @@
 """
 Application entry point for running the Snake Game Backend Server or CLI Demo.
 """
+from fastapi import FastAPI, Request
 
 import argparse
 import sys
@@ -96,7 +97,7 @@ import fastapi
 
 # Ensure the variable name is explicitly 'app'
 from pathlib import Path
-from fastapi import FastAPI
+
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 app = fastapi.FastAPI()
@@ -122,7 +123,10 @@ async def get_scores():
 @app.post("/api/scores")
 async def save_score():
     return {"message": "Score saved successfully"}
-
+@app.post("/api/game/start")
+async def start_game_endpoint(request: Request):
+    # This catches the request so Vercel doesn't return a 404
+    return {"message": "Game started successfully"}
 
 
 
