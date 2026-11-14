@@ -103,7 +103,7 @@ app = fastapi.FastAPI()
 
 @app.get("/")
 async def read_index():
-    return FileResponse("static/index.html")
+    return FileResponse("static/**")
 
 
 
