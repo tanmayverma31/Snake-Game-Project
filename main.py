@@ -124,9 +124,10 @@ async def get_scores():
 async def save_score():
     return {"message": "Score saved successfully"}
 @app.post("/api/game/start")
-async def start_game_endpoint(request: Request):
+async def start_game_endpoint():
     # This catches the request so Vercel doesn't return a 404
     return {"message": "Game started successfully"}
+    
 
 
 
