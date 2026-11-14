@@ -94,11 +94,19 @@ def main():
 import fastapi
 
 # Ensure the variable name is explicitly 'app'
+from pathlib import Path
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
 app = fastapi.FastAPI()
+BASE_DIR = Path(__file__).resolve().parent
+
 
 @app.get("/")
-def read_root():
-    return {"message": "Hello World"}
+async def read_index():
+    return FileResponse(BASE_DIR / "index.html")
+
+
+
 
 if __name__ == "__main__":
     main()
