@@ -32,16 +32,16 @@ class GameAPI {
     };
 
    try {
-    // 1. Instantly fix the path if it accidentally contains localhost
-    url = url.replace("http://localhost:8000", "").replace("http://127.0.0.1:8000", "");
+    // 1. Create a NEW variable to hold the corrected string
+    const fixedUrl = url.replace("http://localhost:8000", "").replace("http://127.0.0.1:8000", "");
 
-    const response = await fetch(url, config);
+    // 2. Use fixedUrl for the fetch command
+    const response = await fetch(fixedUrl, config);
     const isJson = (response.headers.get('content-type') || '').includes('application/json');
     const data = isJson ? await response.json() : await response.text();
 
     if (!response.ok) {
-        // 2. Pop up an alert on your screen with the exact missing URL
-        alert("Vercel is missing this exact route: " + url);
+        alert("Vercel is missing this exact route: " + fixedUrl);
         
         const errorMsg = (typeof data === 'object' && data.message) ? data.message : response.statusText;
         const err = new Error(errorMsg);
@@ -50,7 +50,8 @@ class GameAPI {
         throw err;
     }
     return data;
-    }
+}
+    
      catch (err) {
       console.warn(`[GameAPI] Request error on ${endpoint}:`, err.message);
       throw err;
