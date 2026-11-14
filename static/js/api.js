@@ -39,8 +39,7 @@ class GameAPI {
     const data = isJson ? await response.json() : await response.text();
 
     if (!response.ok) {
-        // 2. Pop up an alert on your screen with the exact missing URL
-      
+       
         
         const errorMsg = (typeof data === 'object' && data.message) ? data.message : response.statusText;
         const err = new Error(errorMsg);
