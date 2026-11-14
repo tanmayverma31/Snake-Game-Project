@@ -1,0 +1,3 @@
+"""
+Snake backend test suite.
+"""

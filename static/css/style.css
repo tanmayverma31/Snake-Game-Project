@@ -1,0 +1,207 @@
+/* ====================================================================
+   CYBERSNAKE ARCADE - BASE & THEME STYLESHEET
+   Design: Modern Cyberpunk / Retro Neon Arcade
+   ==================================================================== */
+
+:root {
+  /* Color Palette */
+  --bg-dark: #07080d;
+  --bg-card: rgba(16, 20, 31, 0.85);
+  --bg-card-hover: rgba(24, 30, 46, 0.95);
+  --bg-card-border: rgba(0, 255, 136, 0.2);
+  --bg-card-border-dim: rgba(255, 255, 255, 0.08);
+
+  /* Neon Accents */
+  --neon-green: #00ff88;
+  --neon-green-dim: rgba(0, 255, 136, 0.15);
+  --neon-green-glow: rgba(0, 255, 136, 0.5);
+  --neon-cyan: #00e5ff;
+  --neon-cyan-glow: rgba(0, 229, 255, 0.5);
+  --neon-red: #ff2a5f;
+  --neon-red-glow: rgba(255, 42, 95, 0.5);
+  --neon-gold: #ffbe0b;
+  --neon-purple: #9d4edd;
+
+  /* Text & Surfaces */
+  --text-primary: #f0f4fc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  /* Fonts */
+  --font-arcade: 'Orbitron', -apple-system, sans-serif;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Radii & Transitions */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+/* Reset & Box Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Ambient Neon Glow Blobs */
+.ambient-glow {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(140px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+}
+
+.glow-top {
+  top: -100px;
+  left: 20%;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, var(--neon-cyan-glow) 0%, transparent 70%);
+}
+
+.glow-bottom {
+  bottom: -150px;
+  right: 15%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--neon-green-glow) 0%, transparent 70%);
+}
+
+/* Subtle Cyber Grid Overlay */
+.cyber-grid-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Main App Shell */
+.app-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 960px;
+  min-height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.25rem 2rem;
+}
+
+/* Top Navigation Bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--bg-card-border-dim);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 0 8px var(--neon-green));
+}
+
+.brand-text {
+  font-family: var(--font-arcade);
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.badge-version {
+  font-size: 0.65rem;
+  font-family: var(--font-arcade);
+  color: var(--neon-cyan);
+  background: rgba(0, 229, 255, 0.12);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  margin-left: 0.25rem;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* View Containers (Single Page Application switching) */
+.view {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  animation: fadeIn var(--transition-normal);
+}
+
+.view.active-view {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Typography Utilities */
+.text-neon {
+  color: var(--neon-green);
+  text-shadow: 0 0 10px var(--neon-green-glow);
+}
+
+.glow-title {
+  font-family: var(--font-arcade);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-align: center;
+  text-shadow: 0 0 20px rgba(0, 255, 136, 0.35);
+}
+
+.glow-red {
+  color: var(--neon-red);
+  text-shadow: 0 0 15px var(--neon-red-glow);
+}
+
+/* Hidden Utility */
+.hidden {
+  display: none !important;
+}

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CyberSnake Arcade | Modern Snake Game</title>
+  <meta name="description" content="Modern arcade-style Snake game with neon visuals, responsive canvas, persistent leaderboards, and Google Gemini AI features.">
+  
+  <!-- Google Fonts: Orbitron (Arcade / Sci-Fi) & Inter (Clean UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/components.css">
+</head>
+<body class="arcade-theme">
+
+  <!-- Background Ambient Glow & Cyber Grid -->
+  <div class="ambient-glow glow-top"></div>
+  <div class="ambient-glow glow-bottom"></div>
+  <div class="cyber-grid-overlay"></div>
+
+  <!-- Main Container -->
+  <div id="app" class="app-container">
+
+    <!-- Top Navigation Bar -->
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-icon">🐍</span>
+        <span class="brand-text">CYBER<span class="text-neon">SNAKE</span></span>
+        <span class="badge-version">v2.0</span>
+      </div>
+
+      <div class="top-actions">
+        <!-- AI Status Badge -->
+        <div id="aiStatusBadge" class="ai-badge" title="Gemini AI Status">
+          <span class="ai-dot"></span>
+          <span class="ai-label">AI: Checking...</span>
+        </div>
+
+        <!-- Sound Toggle -->
+        <button id="soundToggleBtn" class="icon-btn" aria-label="Toggle Sound" title="Mute/Unmute (M)">
+          <span class="icon">🔊</span>
+        </button>
+
+        <!-- Leaderboard Open Button -->
+        <button id="openLeaderboardBtn" class="btn btn-secondary btn-sm">
+          🏆 Leaderboard
+        </button>
+      </div>
+    </header>
+
+    <!-- ==================================================================== -->
+    <!-- 1. HOME SCREEN VIEW -->
+    <!-- ==================================================================== -->
+    <section id="homeView" class="view active-view">
+      <div class="home-card">
+        <div class="logo-area">
+          <h1 class="game-title glow-title">CYBER<span class="text-neon">SNAKE</span></h1>
+          <p class="tagline">Classic Arcade Gameplay • Neural AI Tactics • Global Leaderboards</p>
+        </div>
+
+        <!-- Player Name Input -->
+        <div class="form-group">
+          <label for="playerNameInput" class="form-label">PILOT CODENAME</label>
+          <div class="input-wrapper">
+            <input type="text" id="playerNameInput" class="text-input" placeholder="Enter codename" maxlength="25" spellcheck="false" autocomplete="off" value="ViperAce">
+            <span class="input-glow"></span>
+          </div>
+        </div>
+
+        <!-- Difficulty Preset Selector -->
+        <div class="difficulty-section">
+          <label class="form-label">SIMULATION SPEED / DIFFICULTY</label>
+          <div class="difficulty-grid" role="radiogroup" aria-label="Difficulty Selection">
+            <button class="diff-card" data-diff="EASY">
+              <span class="diff-name">EASY</span>
+              <span class="diff-speed">200ms</span>
+              <span class="diff-mult">1.0x PTS</span>
+            </button>
+            <button class="diff-card active" data-diff="MEDIUM">
+              <span class="diff-badge">RECOMMENDED</span>
+              <span class="diff-name">MEDIUM</span>
+              <span class="diff-speed">130ms</span>
+              <span class="diff-mult">1.5x PTS</span>
+            </button>
+            <button class="diff-card" data-diff="HARD">
+              <span class="diff-name">HARD</span>
+              <span class="diff-speed">80ms</span>
+              <span class="diff-mult">2.0x PTS</span>
+            </button>
+            <button class="diff-card" data-diff="EXPERT">
+              <span class="diff-name">EXPERT</span>
+              <span class="diff-speed">50ms</span>
+              <span class="diff-mult">3.0x PTS</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Best Score Banner -->
+        <div class="personal-best-banner">
+          <span class="pb-label">PERSONAL BEST:</span>
+          <span id="homeBestScore" class="pb-val">0 PTS</span>
+        </div>
+
+        <!-- AI Daily Challenge Card -->
+        <div id="aiChallengeCard" class="challenge-card">
+          <div class="challenge-header">
+            <span class="challenge-tag">🤖 GEMINI ARCADE TRIAL</span>
+            <button id="refreshChallengeBtn" class="refresh-challenge-btn" title="Generate New Challenge">⟳</button>
+          </div>
+          <div id="challengeTitle" class="challenge-title">Loading Daily Challenge...</div>
+          <div id="challengeGoal" class="challenge-goal">Score 150 points without colliding with the perimeter.</div>
+          <div id="challengeBonus" class="challenge-bonus">Bonus: Complete in under 45 seconds.</div>
+        </div>
+
+        <!-- Primary Action -->
+        <div class="home-actions">
+          <button id="playBtn" class="btn btn-primary btn-glow btn-lg">
+            ⚡ LAUNCH MISSION
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 2. GAME SCREEN VIEW -->
+    <!-- ==================================================================== -->
+    <section id="gameView" class="view">
+      
+      <!-- In-Game Heads-Up Display (HUD) -->
+      <div class="game-hud">
+        <div class="hud-pill">
+          <span class="hud-label">SCORE</span>
+          <span id="hudScore" class="hud-val text-neon">0</span>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">BEST</span>
+          <span id="hudBest" class="hud-val">0</span>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">FOOD</span>
+          <span id="hudFoods" class="hud-val">0</span>
+        </div>
+        <div class="hud-pill hud-hide-mobile">
+          <span class="hud-label">DIFF</span>
+          <span id="hudDiff" class="hud-val">MED</span>
+        </div>
+        <div class="hud-actions">
+          <button id="aiHintBtn" class="btn btn-ai btn-sm" title="Ask Gemini AI for Move Advice (H)">
+            🧠 AI Hint
+          </button>
+          <button id="pauseBtn" class="icon-btn btn-sm" aria-label="Pause Game" title="Pause (Space / P)">
+            ⏸
+          </button>
+          <button id="inGameRestartBtn" class="icon-btn btn-sm" aria-label="Restart Game" title="Restart (R)">
+            🔄
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Tactical Hint Banner (Pop-in) -->
+      <div id="aiHintBanner" class="ai-hint-banner hidden">
+        <div class="ai-hint-content">
+          <span class="ai-hint-rec" id="hintRecDirection">REC: UP</span>
+          <span class="ai-hint-danger" id="hintDangerLevel">DANGER: LOW</span>
+          <span class="ai-hint-text" id="hintTip">Turning UP paths toward the food while keeping open corridors.</span>
+        </div>
+        <button id="closeHintBtn" class="hint-close">✕</button>
+      </div>
+
+      <!-- Canvas Board Container -->
+      <div class="canvas-wrapper">
+        <canvas id="gameCanvas" width="600" height="600"></canvas>
+        
+        <!-- Pause Overlay -->
+        <div id="pauseOverlay" class="canvas-overlay hidden">
+          <div class="overlay-card">
+            <h2 class="overlay-title">PAUSED</h2>
+            <p class="overlay-sub">Simulation suspended</p>
+            <div class="overlay-actions">
+              <button id="resumeBtn" class="btn btn-primary btn-md">▶ RESUME (Space)</button>
+              <button id="pauseRestartBtn" class="btn btn-secondary btn-md">🔄 RESTART</button>
+              <button id="quitHomeBtn" class="btn btn-danger btn-md">🏠 ABORT TO HOME</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Esports Commentary Ticker -->
+      <div class="commentary-ticker">
+        <span class="ticker-badge">🎙 COMMENTATOR</span>
+        <span id="commentaryText" class="ticker-text">Welcome to the arena. Slither with precision.</span>
+      </div>
+
+      <!-- Mobile Touch On-Screen D-Pad Controls -->
+      <div class="mobile-dpad">
+        <div class="dpad-row">
+          <button class="dpad-btn" data-dir="UP" aria-label="Up">▲</button>
+        </div>
+        <div class="dpad-row">
+          <button class="dpad-btn" data-dir="LEFT" aria-label="Left">◀</button>
+          <div class="dpad-center"></div>
+          <button class="dpad-btn" data-dir="RIGHT" aria-label="Right">▶</button>
+        </div>
+        <div class="dpad-row">
+          <button class="dpad-btn" data-dir="DOWN" aria-label="Down">▼</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 3. GAME OVER MODAL -->
+    <!-- ==================================================================== -->
+    <div id="gameOverModal" class="modal-backdrop hidden">
+      <div class="modal-card game-over-card">
+        <div class="skull-badge">💀</div>
+        <h2 class="modal-title glow-red">SIMULATION TERMINATED</h2>
+        <p id="gameOverReason" class="game-over-reason">Snake collided with a wall.</p>
+
+        <!-- AI Epitaph Card -->
+        <div id="aiEpitaphCard" class="epitaph-card">
+          <div class="epitaph-header">
+            <span class="epitaph-sparkle">✨</span>
+            <span id="epitaphTitle" class="epitaph-title">Generating Serpent Epitaph...</span>
+          </div>
+          <p id="epitaphText" class="epitaph-body">Chronicling the brave slithering feats...</p>
+        </div>
+
+        <!-- Match Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span class="stat-label">FINAL SCORE</span>
+            <span id="finalScoreVal" class="stat-val text-neon">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">BEST SCORE</span>
+            <span id="finalBestVal" class="stat-val">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">FOOD CONSUMED</span>
+            <span id="finalFoodsVal" class="stat-val">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">TIME SURVIVED</span>
+            <span id="finalTimeVal" class="stat-val">0.0s</span>
+          </div>
+        </div>
+
+        <div id="newHighScoreAlert" class="new-high-score-banner hidden">
+          🎉 NEW PERSONAL HIGH SCORE ACHIEVED!
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="modal-actions">
+          <button id="playAgainBtn" class="btn btn-primary btn-glow btn-md">
+            🔄 PLAY AGAIN (Enter)
+          </button>
+          <button id="viewLeaderboardFromGameOver" class="btn btn-secondary btn-md">
+            🏆 LEADERBOARD
+          </button>
+          <button id="returnHomeFromGameOver" class="btn btn-tertiary btn-md">
+            🏠 HOME
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- 4. LEADERBOARD MODAL -->
+    <!-- ==================================================================== -->
+    <div id="leaderboardModal" class="modal-backdrop hidden">
+      <div class="modal-card leaderboard-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="trophy-icon">🏆</span>
+            <h2 class="modal-title">GLOBAL LEADERBOARD</h2>
+          </div>
+          <button id="closeLeaderboardBtn" class="modal-close" aria-label="Close Leaderboard">✕</button>
+        </div>
+
+        <!-- Leaderboard Difficulty Tabs -->
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="ALL">ALL</button>
+          <button class="tab-btn" data-tab="EASY">EASY</button>
+          <button class="tab-btn" data-tab="MEDIUM">MEDIUM</button>
+          <button class="tab-btn" data-tab="HARD">HARD</button>
+          <button class="tab-btn" data-tab="EXPERT">EXPERT</button>
+        </div>
+
+        <!-- Leaderboard Table Container -->
+        <div class="table-wrapper">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>RANK</th>
+                <th>PILOT</th>
+                <th>SCORE</th>
+                <th>DIFF</th>
+                <th>FOOD</th>
+                <th>TIME</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+              <tr>
+                <td colspan="6" class="table-empty">Loading top scores...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Player Personal Best Footer -->
+        <div class="player-stats-footer">
+          <span class="footer-label">PILOT BEST (<span id="statsPlayerName">ViperAce</span>):</span>
+          <span id="statsPersonalBestScore" class="footer-val text-neon">0 PTS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>
