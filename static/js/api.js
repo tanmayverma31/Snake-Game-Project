@@ -31,29 +31,35 @@ class GameAPI {
       headers,
     };
 
-    try {
-      const response = await fetch(url, config);
-      const isJson = (response.headers.get('content-type') || '').includes('application/json');
-      const data = isJson ? await response.json() : await response.text();
+   try {
+    // 1. Instantly fix the path if it accidentally contains localhost
+    url = url.replace("http://localhost:8000", "").replace("http://127.0.0.1:8000", "");
 
-      if (!response.ok) {
-        const errorMsg = (typeof data === 'object' && data.message) ? data.message : (response.statusText || 'Request failed');
+    const response = await fetch(url, config);
+    const isJson = (response.headers.get('content-type') || '').includes('application/json');
+    const data = isJson ? await response.json() : await response.text();
+
+    if (!response.ok) {
+        // 2. Pop up an alert on your screen with the exact missing URL
+        alert("Vercel is missing this exact route: " + url);
+        
+        const errorMsg = (typeof data === 'object' && data.message) ? data.message : response.statusText;
         const err = new Error(errorMsg);
         err.status = response.status;
         err.data = data;
         throw err;
-      }
-
-      return data;
-    } catch (err) {
+    }
+    return data;
+    }
+     catch (err) {
       console.warn(`[GameAPI] Request error on ${endpoint}:`, err.message);
       throw err;
-    }
+      }
   }
 
   // --- Core Game APIs ---
 
-  static async startGame({ playerName = 'Player', difficulty = 'MEDIUM', width = 20, height = 20 } = {}) {
+   static async startGame({ playerName = 'Player', difficulty = 'MEDIUM', width = 20, height = 20 } = {}) {
     return this.request('/api/game/start', {
       method: 'POST',
       body: JSON.stringify({
