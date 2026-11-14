@@ -125,8 +125,19 @@ async def save_score():
     return {"message": "Score saved successfully"}
 @app.post("/api/game/start")
 async def start_game_endpoint():
-    # This catches the request so Vercel doesn't return a 404
-    return {"message": "Game started successfully"}
+    return {
+        "status": "success",
+        "message": "Game started",
+        "snake": [{"x": 10, "y": 10}, {"x": 10, "y": 11}],
+        "food": {"x": 5, "y": 5},
+        "score": 0,
+        # Including game_state in case your frontend expects it nested
+        "game_state": {
+            "snake": [{"x": 10, "y": 10}, {"x": 10, "y": 11}],
+            "food": {"x": 5, "y": 5},
+            "score": 0
+        }
+    }
     
 
 
