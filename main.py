@@ -113,6 +113,16 @@ async def read_index():
     html_path = os.path.join(static_dir, "index.html")
     return FileResponse(html_path)
 
+# If the game is just fetching data:
+@app.get("/api/scores")
+async def get_scores():
+    return {"message": "Success", "scores": []}
+    
+# If the game is trying to send/save a score, add this too:
+@app.post("/api/scores")
+async def save_score():
+    return {"message": "Score saved successfully"}
+
 
 
 
