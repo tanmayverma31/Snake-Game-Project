@@ -154,6 +154,36 @@ async def get_ai_challenge(difficulty: str = "EASY"):
             "score": 0
         }
     }
+    @app.post("/api/game/start")
+async def start_game_endpoint():
+    return {
+        "status": "success",
+        "message": "Game started",
+        "width": 20,
+        "height": 20,
+        "game_state": {
+            "width": 20,
+            "height": 20,
+            "snake": [{"x": 10, "y": 10}],
+            "food": {"x": 5, "y": 5},
+            "score": 0
+        }
+    }
+
+@app.get("/api/game/ai/challenge")
+async def get_ai_challenge(difficulty: str = "EASY"):
+    return {
+        "status": "success",
+        "width": 20,
+        "height": 20,
+        "game_state": {
+            "width": 20,
+            "height": 20,
+            "snake": [{"x": 10, "y": 10}],
+            "food": {"x": 5, "y": 5},
+            "score": 0
+        }
+    }
     
 
 
