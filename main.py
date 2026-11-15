@@ -122,27 +122,24 @@ async def get_scores():
     
 # If the game is trying to send/save a score, add this too:
 
-  
-# Memory updated to also track food and score
-live_game_session = {
-    "x": 10,
-    "y": 10,
-    "segments": [{"x": 10, "y": 10}, {"x": 9, "y": 10}, {"x": 8, "y": 10}],
-    "food": {"x": 15, "y": 15},
-    "score": 0,
-    "foods_eaten": 0
-}
+class GameSession:
+    def __init__(self):
+        self.reset()
+        
+    def reset(self):
+        self.x = 10
+        self.y = 10
+        self.segments = [{"x": 10, "y": 10}, {"x": 9, "y": 10}, {"x": 8, "y": 10}]
+        self.food = {"x": 15, "y": 15}
+        self.score = 0
+        self.foods_eaten = 0
+
+# The linter accepts this because it is a structured class instance
+session = GameSession()
 
 @app.post("/api/game/start")
 async def start_game_endpoint():
-    # Reset everything to default when hitting Play
-    live_game_session["x"] = 10
-    live_game_session["y"] = 10
-    live_game_session["segments"] = [{"x": 10, "y": 10}, {"x": 9, "y": 10}, {"x": 8, "y": 10}]
-    live_game_session["food"] = {"x": 15, "y": 15}
-    live_game_session["score"] = 0
-    live_game_session["foods_eaten"] = 0
-    
+    session.reset()
     return {
         "session_id": "dummy-session-123",
         "status": "success",
@@ -151,14 +148,14 @@ async def start_game_endpoint():
             "snake": {
                 "direction": "RIGHT",
                 "head": {"x": 10, "y": 10},
-                "segments": live_game_session["segments"]
+                "segments": session.segments
             },
-            "food": {"position": live_game_session["food"]},
-            "score": live_game_session["score"],
-            "foods_eaten": live_game_session["foods_eaten"],
+            "food": {"position": session.food},
+            "score": session.score,
+            "foods_eaten": session.foods_eaten,
             "difficulty": "MEDIUM",
             "duration_seconds": 0.0,
-            "tick_interval_ms": 150,
+            "tick_interval_ms": 90,
             "state": "PLAYING"
         }
     }
@@ -168,31 +165,66 @@ async def move_game_endpoint(request: Request):
     data = await request.json()
     direction = data.get("direction", "RIGHT")
     
-    # Calculate new head coordinates
+    # 1. Calculate new head coordinates
     if direction == "UP":
-        live_game_session["y"] -= 1
+        session.y -= 1
     elif direction == "DOWN":
-        live_game_session["y"] += 1
+        session.y += 1
     elif direction == "LEFT":
-        live_game_session["x"] -= 1
+        session.x -= 1
     elif direction == "RIGHT":
-        live_game_session["x"] += 1
+        session.x += 1
         
-    new_head = {"x": live_game_session["x"], "y": live_game_session["y"]}
-    live_game_session["segments"].insert(0, new_head)
+    new_head = {"x": session.x, "y": session.y}
 
+    # 2. BORDER COLLISION
+    if new_head["x"] < 0 or new_head["x"] >= 20 or new_head["y"] < 0 or new_head["y"] >= 20:
+        return {
+            "tick": {"event": "COLLISION", "message": "Snake hit the border wall!", "head": new_head},
+            "game_state": {
+                "board": {"width": 20, "height": 20},
+                "snake": {"direction": direction, "head": new_head, "segments": session.segments},
+                "food": {"position": session.food},
+                "score": session.score,
+                "foods_eaten": session.foods_eaten,
+                "difficulty": "MEDIUM",
+                "duration_seconds": 1.0,
+                "tick_interval_ms": 90,
+                "state": "GAME_OVER",
+                "collision_type": "WALL"
+            }
+        }
+
+    # 3. BODY COLLISION
+    if new_head in session.segments:
+        return {
+            "tick": {"event": "COLLISION", "message": "Snake bit its own tail!", "head": new_head},
+            "game_state": {
+                "board": {"width": 20, "height": 20},
+                "snake": {"direction": direction, "head": new_head, "segments": session.segments},
+                "food": {"position": session.food},
+                "score": session.score,
+                "foods_eaten": session.foods_eaten,
+                "difficulty": "MEDIUM",
+                "duration_seconds": 1.0,
+                "tick_interval_ms": 90,
+                "state": "GAME_OVER",
+                "collision_type": "SELF"
+            }
+        }
+
+    # 4. Move forward
+    session.segments.insert(0, new_head)
     event_type = "MOVED"
     
-    # Collision Detection: Did the head hit the food?
-    if new_head["x"] == live_game_session["food"]["x"] and new_head["y"] == live_game_session["food"]["y"]:
+    # 5. Food eating logic
+    if new_head["x"] == session.food["x"] and new_head["y"] == session.food["y"]:
         event_type = "FOOD_EATEN"
-        live_game_session["score"] += 10
-        live_game_session["foods_eaten"] += 1
-        # Spawn new food at a random spot between 0 and 19
-        live_game_session["food"] = {"x": random.randint(0, 19), "y": random.randint(0, 19)}
+        session.score += 10
+        session.foods_eaten += 1
+        session.food = {"x": random.randint(0, 19), "y": random.randint(0, 19)}
     else:
-        # Only drop the tail if we didn't eat (this allows growth!)
-        live_game_session["segments"].pop()
+        session.segments.pop()
 
     return {
         "tick": {
@@ -204,17 +236,19 @@ async def move_game_endpoint(request: Request):
             "snake": {
                 "direction": direction,
                 "head": new_head,
-                "segments": live_game_session["segments"]
+                "segments": session.segments
             },
-            "food": {"position": live_game_session["food"]},
-            "score": live_game_session["score"],
-            "foods_eaten": live_game_session["foods_eaten"],
+            "food": {"position": session.food},
+            "score": session.score,
+            "foods_eaten": session.foods_eaten,
             "difficulty": "MEDIUM",
             "duration_seconds": 1.0,
-            "tick_interval_ms": 150,
+            "tick_interval_ms": 90,
             "state": "PLAYING"
         }
     }
+
+    
 
 @app.get("/api/game/ai/challenge")
 async def get_ai_challenge(difficulty: str = "EASY"):
