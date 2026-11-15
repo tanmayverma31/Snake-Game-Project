@@ -139,9 +139,9 @@ async def start_game_endpoint():
         }
     }
     @app.get("/api/game/ai/status")
-async def get_ai_status():
+    async def get_ai_status():
     # Tells the frontend the AI backend is ready
-    return {"status": "online"}
+        return {"status": "online"}
 
 @app.get("/api/game/ai/challenge")
 async def get_ai_challenge(difficulty: str = "EASY"):
@@ -155,8 +155,8 @@ async def get_ai_challenge(difficulty: str = "EASY"):
         }
     }
     @app.post("/api/game/start")
-async def start_game_endpoint():
-    return {
+    async def start_game_endpoint():
+        return {
         "status": "success",
         "message": "Game started",
         "width": 20,
