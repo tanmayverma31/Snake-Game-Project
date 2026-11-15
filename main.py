@@ -125,9 +125,20 @@ async def save_score():
     return {"message": "Score saved successfully"}
 
   
-   
+# A simple memory to keep track of the snake's live position
+live_game_session = {
+    "x": 10,
+    "y": 10,
+    "segments": [{"x": 10, "y": 10}, {"x": 9, "y": 10}, {"x": 8, "y": 10}]
+}
+
 @app.post("/api/game/start")
 async def start_game_endpoint():
+    # Reset the snake to the center when hitting Play
+    live_game_session["x"] = 10
+    live_game_session["y"] = 10
+    live_game_session["segments"] = [{"x": 10, "y": 10}, {"x": 9, "y": 10}, {"x": 8, "y": 10}]
+    
     return {
         "session_id": "dummy-session-123",
         "status": "success",
@@ -136,7 +147,7 @@ async def start_game_endpoint():
             "snake": {
                 "direction": "RIGHT",
                 "head": {"x": 10, "y": 10},
-                "segments": [{"x": 10, "y": 10}, {"x": 9, "y": 10}, {"x": 8, "y": 10}]
+                "segments": live_game_session["segments"]
             },
             "food": {"position": {"x": 15, "y": 15}},
             "score": 0,
@@ -147,20 +158,40 @@ async def start_game_endpoint():
             "state": "PLAYING"
         }
     }
+
 @app.post("/api/game/move")
-async def move_game_endpoint():
-    # A basic dummy payload to satisfy the frontend's tick loop
+async def move_game_endpoint(request: Request):
+    # 1. Read which arrow key the player pressed
+    data = await request.json()
+    direction = data.get("direction", "RIGHT")
+    
+    # 2. Calculate the new X and Y coordinates based on direction
+    if direction == "UP":
+        live_game_session["y"] -= 1
+    elif direction == "DOWN":
+        live_game_session["y"] += 1
+    elif direction == "LEFT":
+        live_game_session["x"] -= 1
+    elif direction == "RIGHT":
+        live_game_session["x"] += 1
+        
+    # 3. Move the body segments (new head in front, drop the tail)
+    new_head = {"x": live_game_session["x"], "y": live_game_session["y"]}
+    live_game_session["segments"].insert(0, new_head)
+    live_game_session["segments"].pop()
+
+    # 4. Send the new calculated position back to the game board
     return {
         "tick": {
             "event": "MOVED",
-            "head": {"x": 11, "y": 10}
+            "head": new_head
         },
         "game_state": {
             "board": {"width": 20, "height": 20},
             "snake": {
-                "direction": "RIGHT",
-                "head": {"x": 11, "y": 10},
-                "segments": [{"x": 11, "y": 10}, {"x": 10, "y": 10}, {"x": 9, "y": 10}]
+                "direction": direction,
+                "head": new_head,
+                "segments": live_game_session["segments"]
             },
             "food": {"position": {"x": 15, "y": 15}},
             "score": 0,
@@ -171,6 +202,8 @@ async def move_game_endpoint():
             "state": "PLAYING"
         }
     }
+
+
 @app.get("/api/game/ai/challenge")
 async def get_ai_challenge(difficulty: str = "EASY"):
     return {
@@ -183,8 +216,6 @@ async def get_ai_challenge(difficulty: str = "EASY"):
 @app.get("/api/game/ai/status")
 async def get_ai_status():
     return {"status": "online"}
-
-
 
 
 
