@@ -123,52 +123,28 @@ async def get_scores():
 @app.post("/api/scores")
 async def save_score():
     return {"message": "Score saved successfully"}
+
+  
+   
 @app.post("/api/game/start")
 async def start_game_endpoint():
     return {
         "status": "success",
         "message": "Game started",
-        "snake": [{"x": 10, "y": 10}, {"x": 10, "y": 11}],
-        "food": {"x": 5, "y": 5},
-        "score": 0,
-        # Including game_state in case your frontend expects it nested
-        "game_state": {
-            "snake": [{"x": 10, "y": 10}, {"x": 10, "y": 11}],
-            "food": {"x": 5, "y": 5},
-            "score": 0
-        }
-    }
-    @app.get("/api/game/ai/status")
-    async def get_ai_status():
-    # Tells the frontend the AI backend is ready
-        return {"status": "online"}
-
-@app.get("/api/game/ai/challenge")
-async def get_ai_challenge(difficulty: str = "EASY"):
-    # Returns the actual starting board that the frontend is crashing without
-    return {
-        "status": "success",
-        "game_state": {
-            "snake": [{"x": 10, "y": 10}, {"x": 10, "y": 11}],
-            "food": {"x": 5, "y": 5},
-            "score": 0
-        }
-    }
-    @app.post("/api/game/start")
-    async def start_game_endpoint():
-        return {
-        "status": "success",
-        "message": "Game started",
         "width": 20,
         "height": 20,
         "game_state": {
             "width": 20,
             "height": 20,
-            "snake": [{"x": 10, "y": 10}],
+            "snake": [{"x": 10, "y": 10}, {"x": 10, "y": 11}],
             "food": {"x": 5, "y": 5},
             "score": 0
         }
     }
+
+@app.get("/api/game/ai/status")
+async def get_ai_status():
+    return {"status": "online"}
 
 @app.get("/api/game/ai/challenge")
 async def get_ai_challenge(difficulty: str = "EASY"):
@@ -179,12 +155,12 @@ async def get_ai_challenge(difficulty: str = "EASY"):
         "game_state": {
             "width": 20,
             "height": 20,
-            "snake": [{"x": 10, "y": 10}],
+            "snake": [{"x": 10, "y": 10}, {"x": 10, "y": 11}],
             "food": {"x": 5, "y": 5},
             "score": 0
         }
     }
-    
+
 
 
 
