@@ -147,7 +147,30 @@ async def start_game_endpoint():
             "state": "PLAYING"
         }
     }
-
+@app.post("/api/game/move")
+async def move_game_endpoint():
+    # A basic dummy payload to satisfy the frontend's tick loop
+    return {
+        "tick": {
+            "event": "MOVED",
+            "head": {"x": 11, "y": 10}
+        },
+        "game_state": {
+            "board": {"width": 20, "height": 20},
+            "snake": {
+                "direction": "RIGHT",
+                "head": {"x": 11, "y": 10},
+                "segments": [{"x": 11, "y": 10}, {"x": 10, "y": 10}, {"x": 9, "y": 10}]
+            },
+            "food": {"position": {"x": 15, "y": 15}},
+            "score": 0,
+            "foods_eaten": 0,
+            "difficulty": "MEDIUM",
+            "duration_seconds": 1.0,
+            "tick_interval_ms": 150,
+            "state": "PLAYING"
+        }
+    }
 @app.get("/api/game/ai/challenge")
 async def get_ai_challenge(difficulty: str = "EASY"):
     return {
@@ -160,10 +183,6 @@ async def get_ai_challenge(difficulty: str = "EASY"):
 @app.get("/api/game/ai/status")
 async def get_ai_status():
     return {"status": "online"}
-
-
-
-
 
 
 
