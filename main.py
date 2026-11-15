@@ -129,37 +129,40 @@ async def save_score():
 @app.post("/api/game/start")
 async def start_game_endpoint():
     return {
+        "session_id": "dummy-session-123",
         "status": "success",
-        "message": "Game started",
-        "width": 20,
-        "height": 20,
         "game_state": {
-            "width": 20,
-            "height": 20,
-            "snake": [{"x": 10, "y": 10}, {"x": 10, "y": 11}],
-            "food": {"x": 5, "y": 5},
-            "score": 0
+            "board": {"width": 20, "height": 20},
+            "snake": {
+                "direction": "RIGHT",
+                "head": {"x": 10, "y": 10},
+                "segments": [{"x": 10, "y": 10}, {"x": 9, "y": 10}, {"x": 8, "y": 10}]
+            },
+            "food": {"position": {"x": 15, "y": 15}},
+            "score": 0,
+            "foods_eaten": 0,
+            "difficulty": "MEDIUM",
+            "duration_seconds": 0.0,
+            "tick_interval_ms": 150,
+            "state": "PLAYING"
         }
+    }
+
+@app.get("/api/game/ai/challenge")
+async def get_ai_challenge(difficulty: str = "EASY"):
+    return {
+        "challenge_title": "The First Trial",
+        "goal": "Survive for 1 minute.",
+        "bonus_condition": "Don't hit the walls",
+        "status": "success"
     }
 
 @app.get("/api/game/ai/status")
 async def get_ai_status():
     return {"status": "online"}
 
-@app.get("/api/game/ai/challenge")
-async def get_ai_challenge(difficulty: str = "EASY"):
-    return {
-        "status": "success",
-        "width": 20,
-        "height": 20,
-        "game_state": {
-            "width": 20,
-            "height": 20,
-            "snake": [{"x": 10, "y": 10}, {"x": 10, "y": 11}],
-            "food": {"x": 5, "y": 5},
-            "score": 0
-        }
-    }
+
+
 
 
 
